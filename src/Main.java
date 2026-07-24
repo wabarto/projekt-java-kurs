@@ -13,7 +13,7 @@ public class Main {
 
             // Press Ctrl+D to start debugging your code. We have set one breakpoint
             // for you, but you can always add more by pressing Cmd+F8.
-            System.out.println("create calculator and create feature and feature 3 and feature 4" + i);
+            System.out.println("create calculator and create feature and feature 3 and feature 4 and feature 6" + i);
         }
     }
 }
