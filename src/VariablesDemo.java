@@ -139,5 +139,85 @@ public class VariablesDemo {
         System.out.println(dayName);
         System.out.println(dayNameNew);
 
+
+
+        // loops
+
+        for (int i = 0; i < 5; i++) {
+            System.out.println(i);
+        }
+
+
+        for (int i = 0; i < 5; i--) {
+            System.out.println(i);
+        }
+
+        for (int i = 0; i < 5; i += 2) {
+            System.out.println(i);
+        }
+
+        int found = 2;
+
+        for (int i = 0; i < 5; i++) {
+            if (i == found) {
+                System.out.println(found);
+                break;
+            }
+        }
+
+        for (int i = 0; i < 5; i++) {
+            if (i % 2 != 0) {
+                System.out.println("Nieparzysta");
+                continue;
+            } else {
+                System.out.println("Parzysta");
+            }
+
+            System.out.println("Inna");
+        }
+
+
+        int [] numbers = {10, 20, 30};
+
+        for (int num : numbers) {
+            System.out.println(num);
+        }
+
+
+        for (int i = 0, j = 10; i < j; i++, j--) {
+            System.out.println(j + " " + i);
+        }
+
+
+        int n = 1000;
+
+        for (int i = 0; i < n; i++) {
+            System.out.println(i);
+
+            for (int j = 0; j < n; j++) {
+                System.out.println(j);
+            }
+        }
+
+        //while
+
+        int n = 0;
+
+        while (n > 5) {
+            System.out.println(n);
+            n++;
+        }
+
+
+        // do-while
+
+        int count = 0;
+
+        do {
+            System.out.println(count);
+            count++;
+        } while (count < 3);
+
+
     }
 }
