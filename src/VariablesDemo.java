@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
@@ -5,6 +7,8 @@ import java.util.Comparator;
 import java.util.Scanner;
 
 public class VariablesDemo {
+
+    private static int instanceInt = 10;
     public static void main(String[] args) {
 //        byte b1 = 127; // 8 bitow
 //        byte b2 = -128;
@@ -327,7 +331,52 @@ public class VariablesDemo {
             }
         }
 
+        //metody
+
+
 
 
     }
+
+    {
+
+    }
+
+
+
+    public static int add(int a, int b) {
+        int local = 10;
+        return a + b;
+
+        int temp;
+        for (int b = 0; b < 10; b++) {
+            int xyz = 10;
+
+            for () {
+
+            }
+
+        }
+
+        xyz
+    }
+
+    public static double add(double a, double b) {
+        return a + b;
+    }
+
+//    public static int add(int a, int b, int c) {
+//
+//    }
+//
+//    public double add(double a, double b) {
+//
+//    }
+//
+//    public String add(String a, String b) {
+//
+//    }
+
+
+
 }
