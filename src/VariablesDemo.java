@@ -348,17 +348,20 @@ public class VariablesDemo {
         int local = 10;
         return a + b;
 
-        int temp;
-        for (int b = 0; b < 10; b++) {
-            int xyz = 10;
 
-            for () {
+//        try (BufferedReader br = new BufferedReader(new FileReader("txt.txt"))) {
+//
+//        }
 
-            }
-
-        }
-
-        xyz
+//        int temp;
+//        for (int b = 0; b < 10; b++) {
+//            int xyz = 10;
+//
+//            for () {
+//
+//            }
+//
+//        }
     }
 
     public static double add(double a, double b) {
@@ -376,6 +379,16 @@ public class VariablesDemo {
 //    public String add(String a, String b) {
 //
 //    }
+
+    static void calculate(int n) {
+        if (n == 0) {
+            return;
+        }
+
+        System.out.println("Przed: " + n);
+        calculate(n - 1);
+        System.out.println("Po: " + n);
+    }
 
 
 
