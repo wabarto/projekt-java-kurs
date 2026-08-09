@@ -1,7 +1,12 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class BankAccount {
+
+    private static int accountsCreated = 0;
+
+    private static final double MIN_INITIAL_BALANCE = 0.0;
 
     private final List<String> history = new ArrayList<>();
 
@@ -20,6 +25,40 @@ public class BankAccount {
         this.accountNumber = accountNumber;
         this.balance = balance;
         history.add("Initial balance: " + balance);
+        accountsCreated++;
+    }
+
+
+    private BankAccount(String accountNumber, double balance, String history) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+    }
+
+    public static BankAccount createEmpty(String accountNumber, double balance) {
+//        return new BankAccount(accountNumber, balance);
+        return new BankAccount(accountNumber, balance, "history");
+    }
+
+
+    public BankAccount addBalance(double... amounts) {
+        for (double amount : amounts) {
+            balance += amount;
+        }
+        return this;
+    }
+
+
+    public BankAccount(String accountNumber) {
+        this(accountNumber, 0.0);
+    }
+
+    public BankAccount(BankAccount other) {
+        this(other.accountNumber, other.balance);
+    }
+
+    // BankAccount.getAccountsCreated()
+    public static int getAccountsCreated() {
+        return accountsCreated;
     }
 
     public double getBalance() {
@@ -50,6 +89,32 @@ public class BankAccount {
 
         balance -= amount;
 
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        BankAccount other = (BankAccount) o;
+        return Objects.equals(accountNumber, other.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(accountNumber);
+    }
+
+
+    @Override
+    public String toString() {
+        return "BankAccount[accountNumber=" + accountNumber;
     }
 
 }

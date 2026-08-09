@@ -31,22 +31,37 @@ public class Main {
 //
 //        System.out.println("Balance: " + bankAccount.balance);
 
-        BankAccount bankAccount = new BankAccount("123", 1000);
+        BankAccount bankAccount1 = new BankAccount("123", 1000);
 
-        System.out.println(bankAccount.getBalance());
+        System.out.println(bankAccount1.getBalance());
 
         final List<String> array = new ArrayList<>();
         array.add("1");
         array.add("2");
         System.out.println(array);
 
-        bankAccount.deposit(200);
+        bankAccount1.deposit(200);
 
-        bankAccount.withdraw(400);
+        bankAccount1.withdraw(400);
 
-        System.out.println(bankAccount.getHistory());
+        System.out.println(bankAccount1.getHistory());
 
-        System.out.println(bankAccount.getHistory());
+        System.out.println(bankAccount1.getHistory());
+
+        BankAccount bankAccount2 = BankAccount.createEmpty("123", 5.0)
+                .addBalance(5.0)
+                .addBalance(6.0);
+
+        System.out.println(bankAccount1);
+        System.out.println(bankAccount1 == bankAccount2);
+        System.out.println(bankAccount1.equals(bankAccount2));
+        System.out.println(bankAccount1.getClass().getName());
+        System.out.println(bankAccount1.getClass().getSimpleName());
+
+
+
+
+
 
     }
 }
