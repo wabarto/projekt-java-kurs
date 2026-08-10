@@ -59,6 +59,29 @@ public class Main {
         System.out.println(bankAccount1.getClass().getSimpleName());
 
 
+        List<BankAccount> accounts = List.of(
+                new BankAccount("PL001", 10000),
+                new SavingsAccount("PL02", 5000, 0.3),
+                new CheckingAccount("PL03", 2000, 5.0),
+                new SavingsAccount("PL04", 12000, 0.045)
+        );
+
+        for (BankAccount account : accounts) {
+            System.out.println(account.getDescription());
+        }
+
+        double sum = 0;
+
+        for (BankAccount account : accounts) {
+            sum += account.getBalance();
+        }
+
+        System.out.println(sum);
+
+
+        BankAccount account = new SavingsAccount("PL003", 10000, 0.3);
+        account.getDescription();
+//        account.addInterest();  -> tak sie nie da bo kompilator patrzy na typ referencji -> BankAccount
 
 
 

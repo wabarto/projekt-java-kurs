@@ -10,8 +10,8 @@ public class BankAccount {
 
     private final List<String> history = new ArrayList<>();
 
-    private final String accountNumber;
-    private double balance;
+    protected final String accountNumber;
+    protected double balance;
 
     public BankAccount(String accountNumber, double balance) {
         if (accountNumber == null || accountNumber.isBlank()) {
@@ -37,6 +37,10 @@ public class BankAccount {
     public static BankAccount createEmpty(String accountNumber, double balance) {
 //        return new BankAccount(accountNumber, balance);
         return new BankAccount(accountNumber, balance, "history");
+    }
+
+    public String getDescription() {
+        return String.format("%s: %.2f zł", accountNumber, balance);
     }
 
 
@@ -115,6 +119,12 @@ public class BankAccount {
     @Override
     public String toString() {
         return "BankAccount[accountNumber=" + accountNumber;
+    }
+
+
+
+    public final String formatBalance() {
+        return String.format("%,.2f", balance);
     }
 
 }
