@@ -31,7 +31,7 @@ public class Main {
 //
 //        System.out.println("Balance: " + bankAccount.balance);
 
-        BankAccount bankAccount1 = new BankAccount("123", 1000);
+        BankAccount bankAccount1 = new SavingsAccount("123", 1000, 1.0);
 
         System.out.println(bankAccount1.getBalance());
 
@@ -48,19 +48,19 @@ public class Main {
 
         System.out.println(bankAccount1.getHistory());
 
-        BankAccount bankAccount2 = BankAccount.createEmpty("123", 5.0)
-                .addBalance(5.0)
-                .addBalance(6.0);
+//        BankAccount bankAccount2 = BankAccount.createEmpty("123", 5.0)
+//                .addBalance(5.0)
+//                .addBalance(6.0);
 
-        System.out.println(bankAccount1);
-        System.out.println(bankAccount1 == bankAccount2);
-        System.out.println(bankAccount1.equals(bankAccount2));
-        System.out.println(bankAccount1.getClass().getName());
-        System.out.println(bankAccount1.getClass().getSimpleName());
+//        System.out.println(bankAccount1);
+//        System.out.println(bankAccount1 == bankAccount2);
+//        System.out.println(bankAccount1.equals(bankAccount2));
+//        System.out.println(bankAccount1.getClass().getName());
+//        System.out.println(bankAccount1.getClass().getSimpleName());
 
 
         List<BankAccount> accounts = List.of(
-                new BankAccount("PL001", 10000),
+                //new BankAccount("PL001", 10000), // klasa abstrakcyjna
                 new SavingsAccount("PL02", 5000, 0.3),
                 new CheckingAccount("PL03", 2000, 5.0),
                 new SavingsAccount("PL04", 12000, 0.045)
@@ -85,6 +85,22 @@ public class Main {
 
 
 
+        TransactionHistory transactionHistory = new TransactionHistory();
+        transactionHistory.record("+500");
+        transactionHistory.record("-200");
+//        transactionHistory.remove(0);
+//        transactionHistory.set(0, "+999"); // niepoprawna dziedziczenie
+//        transactionHistory.clear();
+
+
+        // downcasting - rzutowanie w dol hierarchii
+
+        if (account instanceof SavingsAccount s) {
+            s.addInterest();
+        }
+
+
+        CheckingAccount checkingAccount = (CheckingAccount) account;
 
     }
 }

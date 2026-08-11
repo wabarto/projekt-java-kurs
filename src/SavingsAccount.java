@@ -12,6 +12,16 @@ public class SavingsAccount extends BankAccount {
     }
 
     @Override
+    public String getAccountType() {
+        return "oszczędnościowe";
+    }
+
+    @Override
+    public double getMonthlyCost() {
+        return 0;
+    }
+
+    @Override
     public String getDescription() {
         return super.getDescription() + (interestRate * 100);
     }

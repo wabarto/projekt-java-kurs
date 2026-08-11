@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class BankAccount {
+abstract class BankAccount {
 
     private static int accountsCreated = 0;
 
@@ -29,15 +29,23 @@ public class BankAccount {
     }
 
 
+    public abstract String getAccountType();
+
+    public abstract double getMonthlyCost(); // override
+
+    public final String getMonthlyStatement() {
+        return String.format("%s [%s] - saldo %.2f, koszt miesieczny %.2f", accountNumber, getAccountType(), balance, getMonthlyCost());
+    }
+
     private BankAccount(String accountNumber, double balance, String history) {
         this.accountNumber = accountNumber;
         this.balance = balance;
     }
 
-    public static BankAccount createEmpty(String accountNumber, double balance) {
-//        return new BankAccount(accountNumber, balance);
-        return new BankAccount(accountNumber, balance, "history");
-    }
+//    public static BankAccount createEmpty(String accountNumber, double balance) {
+////        return new BankAccount(accountNumber, balance);
+//        return new BankAccount(accountNumber, balance, "history");
+//    }
 
     public String getDescription() {
         return String.format("%s: %.2f zł", accountNumber, balance);
@@ -70,6 +78,15 @@ public class BankAccount {
     }
 
     public void deposit(double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount has to be > 0");
+        }
+
+        balance += amount;
+
+    }
+
+    public void deposit(double amount, String type) { //overload
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount has to be > 0");
         }

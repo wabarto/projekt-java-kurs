@@ -12,6 +12,16 @@ public class CheckingAccount extends BankAccount {
     }
 
     @Override
+    public String getAccountType() {
+        return "bieżące";
+    }
+
+    @Override
+    public double getMonthlyCost() {
+        return monthlyFee;
+    }
+
+    @Override
     public String getDescription() {
         return super.getDescription() + (monthlyFee * 100);
     }
