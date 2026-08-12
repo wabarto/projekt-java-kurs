@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
@@ -100,7 +101,28 @@ public class Main {
         }
 
 
-        CheckingAccount checkingAccount = (CheckingAccount) account;
+//        CheckingAccount checkingAccount = (CheckingAccount) account;
+
+
+        BankAccount a = new SavingsAccount("PL01", 5000, 0.03);
+        BankAccount b = new CheckingAccount("PL02", 1000, 5.0);
+
+        new TransferService(new SmsNotifier("+48111111111")).transfer(a, b, 500);
+        new TransferService(new EmailNotifier("xyz@example.com")).transfer(a, b, 200);
+        new TransferService(new NoOpNotifier()).transfer(a, b, 100);
+
+
+        List<String> list = new LinkedList<>();
+        LinkedList<String> list1 = new LinkedList<>();
+
+
+
+        String text = "123 %s".formatted("123");
+        String text1 = String.format("123 %s", "123");
+        String text2 = "123";
+
+//        InterestPolicy policy = (balance, amount) -> balance + amount;
+
 
     }
 }
