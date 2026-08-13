@@ -124,5 +124,68 @@ public class Main {
 //        InterestPolicy policy = (balance, amount) -> balance + amount;
 
 
+        new GenericExample<String>("Hello");
+        new GenericExample<>("Hello");
+
+
+        System.out.println(findMax(List.of(3, 17, 8)));
+        System.out.println(findMax(List.of("PL01", "PL07")));
+
+        List<SavingsAccount> savings = List.of(new SavingsAccount("PL01", 5000, 0.3));
+        balanceSum(savings);
+        // SavingsAccount == BankAccount
+        // List<SavingsAccount> == List<BankAccount>
+        // List<? extends BankAccount> - lista czegos co jest kontem, mozna czytac BankAccount, nie mozna nic dodac
+        // List<? super SavingsAccount> - list konta oszczednosciowego lub jego nadtypu, mozna dodawac
+        // PECS - Producer Extends, Consumer Super - czytasz z kolekcji - extends, dopisujesz - super
+
+
+        Repository<BankAccount, String> repo = new InMemoryAccountRepository();
+        repo.save(new SavingsAccount("PL01", 5000, 0.3));
+        repo.save(new CheckingAccount("PL02", 2000, 3));
+
+
+        repo.findById("PL01")
+                .ifPresentOrElse(
+                        bankAccount -> System.out.println("Found"),
+                        () -> System.out.println("Not found")
+                );
+
+
     }
+
+//    static double balanceSum(List<BankAccount> accounts) {
+//        double sum = 0;
+//        for (BankAccount acc : accounts) {
+//            sum += acc.getBalance();
+//        }
+//        return sum;
+//    }
+
+    static double balanceSum(List<? extends BankAccount> accounts) {
+        double sum = 0;
+        for (BankAccount acc : accounts) {
+            sum += acc.getBalance();
+        }
+        return sum;
+    }
+
+    static void openAccount(List<? super SavingsAccount> list) {
+        list.add(new SavingsAccount("PL05", 3000, 0.3));
+    }
+
+    public static <T extends Comparable<T>> T findMax(List<T> list) {
+        if (list.isEmpty()) {
+            throw new IllegalArgumentException("List is empty");
+        }
+
+        T max = list.get(0);
+        for (T item : list) {
+            if (item.compareTo(max) > 0) {
+                max = item;
+            }
+        }
+        return max;
+    }
+
 }
