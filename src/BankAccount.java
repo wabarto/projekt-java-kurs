@@ -4,6 +4,8 @@ import java.util.Objects;
 
 abstract class BankAccount {
 
+    private AccountStatus status = AccountStatus.ACTIVE;
+
     private static int accountsCreated = 0;
 
     private static final double MIN_INITIAL_BALANCE = 0.0;
@@ -100,6 +102,10 @@ abstract class BankAccount {
     }
 
     public void withdraw(double amount) {
+        if (!status.canWithdraw()) {
+            throw new IllegalStateException();
+        }
+
         if (amount <= 0) {
             throw new IllegalArgumentException("Amount has to be > 0");
         }
@@ -144,4 +150,15 @@ abstract class BankAccount {
         return String.format("%,.2f", balance);
     }
 
+    public void setStatus(AccountStatus status) {
+        this.status = status;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
 }

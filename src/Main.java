@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
@@ -152,6 +150,49 @@ public class Main {
                 );
 
 
+        // enum
+
+        account.setStatus(AccountStatus.BLOCKED);
+
+        AccountStatus status = AccountStatus.BLOCKED;
+
+
+        System.out.println(status);
+        System.out.println(status.name());
+        System.out.println(status.ordinal());
+
+
+        AccountStatus.valueOf("ACTIVE");
+        Arrays.toString(AccountStatus.values());
+
+        EnumSet<AccountStatus> active = EnumSet.of(AccountStatus.ACTIVE, AccountStatus.BLOCKED);
+
+        EnumMap<AccountStatus, Integer> count = new EnumMap<>(AccountStatus.class);
+        count.put(AccountStatus.ACTIVE, 111);
+
+
+        // record
+
+        Statement statement1 = new Statement("PL01", "savings", 5000);
+
+        System.out.println(statement1.accountNumber());
+        System.out.println(statement1);
+
+        Statement statement2 = new Statement("PL01", "savings", 5000);
+
+        System.out.println(statement1.equals(statement2)); // true
+        System.out.println(statement1 == statement2); // false
+
+
+
+    }
+
+    static String description(AccountStatus status) {
+        return switch(status){
+            case ACTIVE -> "Aktywne";
+            case BLOCKED -> "Zablokowane";
+            case CLOSED -> "Zamkniete";
+        };
     }
 
 //    static double balanceSum(List<BankAccount> accounts) {
