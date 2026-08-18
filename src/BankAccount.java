@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-abstract class BankAccount {
+sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, BusinessAccount {
 
     private AccountStatus status = AccountStatus.ACTIVE;
 

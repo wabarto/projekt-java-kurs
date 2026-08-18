@@ -1,4 +1,4 @@
-public class BusinessAccount extends BankAccount {
+final public class BusinessAccount extends BankAccount {
 
     private String companyName;
 

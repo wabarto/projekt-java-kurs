@@ -1,9 +1,11 @@
+import java.lang.reflect.Field;
+import java.sql.Array;
 import java.util.*;
 
 // Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
 // then press Enter. You can now see whitespace characters in your code.
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IllegalAccessException {
 //        // Press Opt+Enter with your caret at the highlighted text to see how
 //        // IntelliJ IDEA suggests fixing it.
 //        System.out.printf("Hello and welcome1!");
@@ -184,6 +186,36 @@ public class Main {
         System.out.println(statement1 == statement2); // false
 
 
+        // var
+        var bankAccounts = new ArrayList<BankAccount>();
+        var number = "PL01";
+
+        // text block
+        String header = "123\n123";
+
+        String newHeader = """
+                123
+                123
+                """;
+
+        // pattern matching
+        Object obj = repo.findById("PL01").orElseThrow();
+
+        if (obj instanceof SavingsAccount) {
+            SavingsAccount savingsAccount = (SavingsAccount) obj;
+            savingsAccount.addInterest();
+        }
+
+        if (obj instanceof SavingsAccount savingsAccount && savingsAccount.getBalance() > 100) {
+            savingsAccount.addInterest();
+        }
+
+
+        // setAccessible
+        for (Field field : a.getClass().getSuperclass().getDeclaredFields()) {
+            field.setAccessible(true);
+            System.out.println(field.getName() + "=" + field.get(a));
+        }
 
     }
 

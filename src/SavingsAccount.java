@@ -1,4 +1,5 @@
-public class SavingsAccount extends BankAccount {
+@Audited("HIGH")
+final public class SavingsAccount extends BankAccount {
     private final double interestRate;
 
 
@@ -7,6 +8,7 @@ public class SavingsAccount extends BankAccount {
         this.interestRate = interestRate;
     }
 
+    @Audited(value = "CRITICAL", logAmount = true)
     public void addInterest() {
         deposit(balance * interestRate);
     }
