@@ -3,8 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, BusinessAccount {
-
+sealed abstract class BankAccount implements Comparable<BankAccount> permits SavingsAccount, CheckingAccount, BusinessAccount {
     private AccountStatus status = AccountStatus.ACTIVE;
 
     private static int accountsCreated = 0;
@@ -15,6 +14,8 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
 
     protected final String accountNumber;
     protected BigDecimal balance;
+
+    private int transactionCount;
 
     public BankAccount(String accountNumber, BigDecimal balance) {
         if (accountNumber == null || accountNumber.isBlank()) {
@@ -161,5 +162,14 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
 
     public String getAccountNumber() {
         return accountNumber;
+    }
+
+    public int getTransactionCount() {
+        return transactionCount;
+    }
+
+    @Override
+    public int compareTo(BankAccount other) {
+        return this.accountNumber.compareTo(other.accountNumber);
     }
 }

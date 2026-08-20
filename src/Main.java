@@ -294,15 +294,36 @@ public class Main {
         System.out.println(time1);
         System.out.println(time2);
 
+        // sort
+        List<BankAccount> sortAccounts = new ArrayList<>(repo.findAll());
+        Collections.sort(sortAccounts);
 
 
+        // najbogatsi na gorze
+        sortAccounts.sort(Comparator.comparing(BankAccount::getBalance).reversed());
+
+        // typ konta, saldo malejaco, numerze
+
+        sortAccounts.sort(
+                Comparator.comparing(BankAccount::getAccountType)
+                        .thenComparing(Comparator.comparing(BankAccount::getBalance).reversed())
+                        .thenComparing(BankAccount::getAccountNumber)
+        );
 
 
+//        sortAccounts.sort((a, b) -> Integer.compare(a.getTransactionCount(), b.getTransactionCount()));
 
 
+        // lombok
 
+        TransferRequest request = TransferRequest.builder()
+                .fromAccount("PL01")
+                .toAccount("PL02")
+                .build();
 
-
+        Customer customer = new Customer();
+        customer.getEmail();
+        customer.setEmail("test@gmail.com");
 
     }
 
