@@ -1,16 +1,18 @@
+import java.math.BigDecimal;
+
 @Audited("HIGH")
 final public class SavingsAccount extends BankAccount {
-    private final double interestRate;
+    private final BigDecimal interestRate;
 
 
-    public SavingsAccount(String accountNumber, double balance, double interestRate) {
+    public SavingsAccount(String accountNumber, BigDecimal balance, BigDecimal interestRate) {
         super(accountNumber, balance);
         this.interestRate = interestRate;
     }
 
     @Audited(value = "CRITICAL", logAmount = true)
     public void addInterest() {
-        deposit(balance * interestRate);
+        deposit(balance.multiply(interestRate));
     }
 
     @Override
@@ -19,13 +21,13 @@ final public class SavingsAccount extends BankAccount {
     }
 
     @Override
-    public double getMonthlyCost() {
-        return 0;
+    public BigDecimal getMonthlyCost() {
+        return BigDecimal.valueOf(0);
     }
 
     @Override
     public String getDescription() {
-        return super.getDescription() + (interestRate * 100);
+        return super.getDescription() + (interestRate.multiply(BigDecimal.valueOf(100)));
     }
 
 //    @Override cannot override final

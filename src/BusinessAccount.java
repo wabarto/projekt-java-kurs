@@ -1,8 +1,10 @@
+import java.math.BigDecimal;
+
 final public class BusinessAccount extends BankAccount {
 
     private String companyName;
 
-    public BusinessAccount(String accountNumber, double balance, String companyName){
+    public BusinessAccount(String accountNumber, BigDecimal balance, String companyName){
         super(accountNumber, balance);
         this.companyName = companyName;
     }
@@ -13,7 +15,7 @@ final public class BusinessAccount extends BankAccount {
     }
 
     @Override
-    public double getMonthlyCost() {
-        return 49.99;
+    public BigDecimal getMonthlyCost() {
+        return BigDecimal.valueOf(49.99);
     }
 }

@@ -1,8 +1,10 @@
+import java.math.BigDecimal;
+
 final public class CheckingAccount extends BankAccount {
 
-    private double monthlyFee;
+    private BigDecimal monthlyFee;
 
-    public CheckingAccount(String accountNumber, double balance, double monthlyFee){
+    public CheckingAccount(String accountNumber, BigDecimal balance, BigDecimal monthlyFee){
         super(accountNumber, balance);
         this.monthlyFee = monthlyFee;
     }
@@ -17,12 +19,12 @@ final public class CheckingAccount extends BankAccount {
     }
 
     @Override
-    public double getMonthlyCost() {
+    public BigDecimal getMonthlyCost() {
         return monthlyFee;
     }
 
     @Override
     public String getDescription() {
-        return super.getDescription() + (monthlyFee * 100);
+        return super.getDescription() + (monthlyFee.multiply(BigDecimal.valueOf(100)));
     }
 }

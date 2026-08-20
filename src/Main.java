@@ -1,4 +1,6 @@
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.sql.Array;
 import java.util.*;
 
@@ -32,7 +34,7 @@ public class Main {
 //
 //        System.out.println("Balance: " + bankAccount.balance);
 
-        BankAccount bankAccount1 = new SavingsAccount("123", 1000, 1.0);
+        BankAccount bankAccount1 = new SavingsAccount("123", BigDecimal.valueOf(1000), BigDecimal.valueOf(1.0));
 
         System.out.println(bankAccount1.getBalance());
 
@@ -41,9 +43,9 @@ public class Main {
         array.add("2");
         System.out.println(array);
 
-        bankAccount1.deposit(200);
+        bankAccount1.deposit(BigDecimal.valueOf(200));
 
-        bankAccount1.withdraw(400);
+        bankAccount1.withdraw(BigDecimal.valueOf(400));
 
         System.out.println(bankAccount1.getHistory());
 
@@ -62,25 +64,25 @@ public class Main {
 
         List<BankAccount> accounts = List.of(
                 //new BankAccount("PL001", 10000), // klasa abstrakcyjna
-                new SavingsAccount("PL02", 5000, 0.3),
-                new CheckingAccount("PL03", 2000, 5.0),
-                new SavingsAccount("PL04", 12000, 0.045)
+                new SavingsAccount("PL02", BigDecimal.valueOf(5000), BigDecimal.valueOf(0.3)),
+                new CheckingAccount("PL03", BigDecimal.valueOf(2000), BigDecimal.valueOf(5.0)),
+                new SavingsAccount("PL04", BigDecimal.valueOf(12000), BigDecimal.valueOf(0.045))
         );
 
         for (BankAccount account : accounts) {
             System.out.println(account.getDescription());
         }
 
-        double sum = 0;
+        BigDecimal sum = BigDecimal.ZERO;
 
         for (BankAccount account : accounts) {
-            sum += account.getBalance();
+            sum = sum.add(account.getBalance());
         }
 
         System.out.println(sum);
 
 
-        BankAccount account = new SavingsAccount("PL003", 10000, 0.3);
+        BankAccount account = new SavingsAccount("PL003", BigDecimal.valueOf(10000), BigDecimal.valueOf(0.3));
         account.getDescription();
 //        account.addInterest();  -> tak sie nie da bo kompilator patrzy na typ referencji -> BankAccount
 
@@ -104,12 +106,12 @@ public class Main {
 //        CheckingAccount checkingAccount = (CheckingAccount) account;
 
 
-        BankAccount a = new SavingsAccount("PL01", 5000, 0.03);
-        BankAccount b = new CheckingAccount("PL02", 1000, 5.0);
+        BankAccount a = new SavingsAccount("PL01", BigDecimal.valueOf(5000), BigDecimal.valueOf(0.03));
+        BankAccount b = new CheckingAccount("PL02", BigDecimal.valueOf(1000), BigDecimal.valueOf(5.0));
 
-        new TransferService(new SmsNotifier("+48111111111")).transfer(a, b, 500);
-        new TransferService(new EmailNotifier("xyz@example.com")).transfer(a, b, 200);
-        new TransferService(new NoOpNotifier()).transfer(a, b, 100);
+        new TransferService(new SmsNotifier("+48111111111")).transfer(a, b, BigDecimal.valueOf(500));
+        new TransferService(new EmailNotifier("xyz@example.com")).transfer(a, b, BigDecimal.valueOf(200));
+        new TransferService(new NoOpNotifier()).transfer(a, b, BigDecimal.valueOf(100));
 
 
         List<String> list = new LinkedList<>();
@@ -131,7 +133,7 @@ public class Main {
         System.out.println(findMax(List.of(3, 17, 8)));
         System.out.println(findMax(List.of("PL01", "PL07")));
 
-        List<SavingsAccount> savings = List.of(new SavingsAccount("PL01", 5000, 0.3));
+        List<SavingsAccount> savings = List.of(new SavingsAccount("PL01", BigDecimal.valueOf(5000), BigDecimal.valueOf(0.3)));
         balanceSum(savings);
         // SavingsAccount == BankAccount
         // List<SavingsAccount> == List<BankAccount>
@@ -141,8 +143,8 @@ public class Main {
 
 
         Repository<BankAccount, String> repo = new InMemoryAccountRepository();
-        repo.save(new SavingsAccount("PL01", 5000, 0.3));
-        repo.save(new CheckingAccount("PL02", 2000, 3));
+        repo.save(new SavingsAccount("PL01", BigDecimal.valueOf(5000), BigDecimal.valueOf(0.3)));
+        repo.save(new CheckingAccount("PL02", BigDecimal.valueOf(2000), BigDecimal.valueOf(3)));
 
 
         repo.findById("PL01")
@@ -175,12 +177,12 @@ public class Main {
 
         // record
 
-        Statement statement1 = new Statement("PL01", "savings", 5000);
+        Statement statement1 = new Statement("PL01", "savings", BigDecimal.valueOf(5000));
 
         System.out.println(statement1.accountNumber());
         System.out.println(statement1);
 
-        Statement statement2 = new Statement("PL01", "savings", 5000);
+        Statement statement2 = new Statement("PL01", "savings", BigDecimal.valueOf(5000));
 
         System.out.println(statement1.equals(statement2)); // true
         System.out.println(statement1 == statement2); // false
@@ -206,7 +208,7 @@ public class Main {
             savingsAccount.addInterest();
         }
 
-        if (obj instanceof SavingsAccount savingsAccount && savingsAccount.getBalance() > 100) {
+        if (obj instanceof SavingsAccount savingsAccount && savingsAccount.getBalance().compareTo(BigDecimal.valueOf(100)) > 0) {
             savingsAccount.addInterest();
         }
 
@@ -216,6 +218,91 @@ public class Main {
             field.setAccessible(true);
             System.out.println(field.getName() + "=" + field.get(a));
         }
+
+
+        // BigDecimal
+
+        BankAccount newSavingsAccount = new SavingsAccount("PL02", BigDecimal.valueOf(0), BigDecimal.valueOf(0.3));
+
+        for (int i = 0; i < 10; i++) {
+            newSavingsAccount.deposit(BigDecimal.valueOf(0.10));
+        }
+
+        System.out.println(newSavingsAccount.getBalance());
+        System.out.println(newSavingsAccount.getBalance().compareTo(BigDecimal.valueOf(1.0)) == 0);
+
+        // 0001100....
+
+        System.out.println(new BigDecimal(0.1)); // tak nie robimy
+        System.out.println(new BigDecimal("0.1"));
+        BigDecimal.valueOf(0.1);
+
+
+        System.out.println(new BigDecimal("10").divide(new BigDecimal("3"), 2, RoundingMode.HALF_UP));
+
+        // 5.0 - skala 1
+        // 5.00 - skala 2
+
+        BigDecimal aBigDecimal = new BigDecimal("5.0");
+        BigDecimal bBigDecimal = new BigDecimal("5.00");
+
+        System.out.println(aBigDecimal.equals(bBigDecimal));
+        System.out.println(aBigDecimal.compareTo(bBigDecimal) == 0);
+
+        // String
+
+        String s = " PL01 PL02 PL03  ";
+        s.toUpperCase();
+        System.out.println(s);
+
+        String upper = s.toUpperCase();
+
+        System.out.println(s.strip());
+        s.isBlank();
+        s.isEmpty();
+        s.contains("123");
+        System.out.println(s.indexOf("xy"));
+        System.out.println(s.substring(1));
+        s.replace(" ", "");
+        String[] arrayString = s.strip().split(" ");
+        System.out.println(arrayString);
+        for (String word : arrayString) {
+            System.out.println(word);
+        }
+
+        long start = System.nanoTime();
+
+        String str = "";
+
+        for (int i = 0; i < 50000; i++) {
+            str += i;
+        }
+
+        long time1 = System.nanoTime() - start;
+
+        start = System.nanoTime();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 50000; i++) {
+            sb.append(i);
+        }
+
+        String stringSb = sb.toString();
+
+        long time2 = System.nanoTime() - start;
+
+        System.out.println(time1);
+        System.out.println(time2);
+
+
+
+
+
+
+
+
+
+
 
     }
 
@@ -228,23 +315,23 @@ public class Main {
     }
 
 //    static double balanceSum(List<BankAccount> accounts) {
-//        double sum = 0;
+//        BigDecimal sum = BigDecimal.ZERO;
 //        for (BankAccount acc : accounts) {
-//            sum += acc.getBalance();
+//            sum = sum.add(acc.getBalance());
 //        }
 //        return sum;
 //    }
 
-    static double balanceSum(List<? extends BankAccount> accounts) {
-        double sum = 0;
+    static BigDecimal balanceSum(List<? extends BankAccount> accounts) {
+        BigDecimal sum = BigDecimal.ZERO;
         for (BankAccount acc : accounts) {
-            sum += acc.getBalance();
+            sum = sum.add(acc.getBalance());
         }
         return sum;
     }
 
     static void openAccount(List<? super SavingsAccount> list) {
-        list.add(new SavingsAccount("PL05", 3000, 0.3));
+        list.add(new SavingsAccount("PL05", BigDecimal.valueOf(3000), BigDecimal.valueOf(0.3)));
     }
 
     public static <T extends Comparable<T>> T findMax(List<T> list) {

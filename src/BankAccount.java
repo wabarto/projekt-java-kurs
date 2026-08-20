@@ -1,3 +1,4 @@
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,14 +14,14 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
     private final List<String> history = new ArrayList<>();
 
     protected final String accountNumber;
-    protected double balance;
+    protected BigDecimal balance;
 
-    public BankAccount(String accountNumber, double balance) {
+    public BankAccount(String accountNumber, BigDecimal balance) {
         if (accountNumber == null || accountNumber.isBlank()) {
             throw new IllegalArgumentException("Account number is required");
         }
 
-        if (balance < 0) {
+        if (balance.signum() < 0) {
             throw new IllegalArgumentException("Balance has to be > 0");
         }
 
@@ -33,13 +34,13 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
 
     public abstract String getAccountType();
 
-    public abstract double getMonthlyCost(); // override
+    public abstract BigDecimal getMonthlyCost(); // override
 
     public final String getMonthlyStatement() {
         return String.format("%s [%s] - saldo %.2f, koszt miesieczny %.2f", accountNumber, getAccountType(), balance, getMonthlyCost());
     }
 
-    private BankAccount(String accountNumber, double balance, String history) {
+    private BankAccount(String accountNumber, BigDecimal balance, String history) {
         this.accountNumber = accountNumber;
         this.balance = balance;
     }
@@ -54,16 +55,16 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
     }
 
 
-    public BankAccount addBalance(double... amounts) {
-        for (double amount : amounts) {
-            balance += amount;
+    public BankAccount addBalance(BigDecimal... amounts) {
+        for (BigDecimal amount : amounts) {
+            balance = balance.add(amount);
         }
         return this;
     }
 
 
     public BankAccount(String accountNumber) {
-        this(accountNumber, 0.0);
+        this(accountNumber, BigDecimal.valueOf(0.0));
     }
 
     public BankAccount(BankAccount other) {
@@ -75,25 +76,25 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
         return accountsCreated;
     }
 
-    public double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
-    public void deposit(double amount) {
-        if (amount <= 0) {
+    public void deposit(BigDecimal amount) {
+        if (amount.signum() <= 0) {
             throw new IllegalArgumentException("Amount has to be > 0");
         }
 
-        balance += amount;
+        balance = balance.add(amount);
 
     }
 
-    public void deposit(double amount, String type) { //overload
-        if (amount <= 0) {
+    public void deposit(BigDecimal amount, String type) { //overload
+        if (amount.signum() <= 0) {
             throw new IllegalArgumentException("Amount has to be > 0");
         }
 
-        balance += amount;
+        balance = balance.add(amount);
 
     }
 
@@ -101,20 +102,20 @@ sealed abstract class BankAccount permits SavingsAccount, CheckingAccount, Busin
         return List.copyOf(history);
     }
 
-    public void withdraw(double amount) {
+    public void withdraw(BigDecimal amount) {
         if (!status.canWithdraw()) {
             throw new IllegalStateException();
         }
 
-        if (amount <= 0) {
+        if (amount.signum() <= 0) {
             throw new IllegalArgumentException("Amount has to be > 0");
         }
 
-        if (amount > balance) {
+        if (amount.compareTo(balance) > 0) {
             throw new IllegalStateException("Incorrect amount");
         }
 
-        balance -= amount;
+        balance = balance.subtract(amount);
 
     }
 

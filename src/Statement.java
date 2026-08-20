@@ -1,4 +1,6 @@
-record Statement(String accountNumber, String accountType, double balance) {
+import java.math.BigDecimal;
+
+record Statement(String accountNumber, String accountType, BigDecimal balance) {
 
     Statement {
         if (accountNumber == null) {
