@@ -322,9 +322,72 @@ public class Main {
                 .build();
 
         Customer customer = new Customer();
-        customer.getEmail();
+        TransactionHistory transactionHistory1 = customer.getTransactionHistory();
+//        transactionHistory1.getEntries();
         customer.setEmail("test@gmail.com");
 
+        // Optional<T>
+
+
+        Optional<String> o1 = Optional.of("x");
+        Optional<String> o2 = Optional.ofNullable(customer.getEmail());
+        Optional<Customer> empty = Optional.empty();
+        Optional<String> emptyString = Optional.empty();
+
+
+        System.out.println(o1.isPresent());
+        System.out.println(empty.isEmpty());
+
+        System.out.println(o1.orElse("brak"));
+//        System.out.println(empty.orElseThrow()); // NoSuchElementException
+//
+//        System.out.println(empty.orElseThrow(() -> new IllegalArgumentException())); // IllegalArgumentException
+//
+
+        System.out.println("orElse");
+        o1.orElse(expensiveDefault());
+
+        System.out.println("orElseGet");
+        o1.orElseGet(() -> expensiveDefault());
+
+
+        o1.ifPresent(print -> System.out.println("print"));
+
+        o1.ifPresentOrElse(
+                print -> System.out.println("print" + print),
+                () -> System.out.println("print")
+        );
+
+
+        System.out.println(o1.map(String::toUpperCase));
+        System.out.println(emptyString.map(String::toUpperCase));
+
+        Optional<BankAccount> accountOptional = repo.findById("PL01");
+
+        Optional<BankAccount> activeBankAccount = accountOptional.filter(account2 -> account2.getBalance().signum() > 0);
+
+        //Optional<String> withMap = accountOptional.map(BankAccount::getOptionalDescription);
+
+
+        Optional<String> withFlatMap = accountOptional.flatMap(BankAccount::getOptionalDescription);
+
+
+        String city = accountOptional
+                .flatMap(BankAccount::getCustomer)
+                .flatMap(Customer::getAddress)
+                .flatMap(Address::getCity)
+                .filter(c -> !c.isBlank())
+                .map(String::toUpperCase)
+                .orElse("123");
+
+
+
+
+    }
+
+    static String expensiveDefault() {
+        System.out.println("domyslna");
+        return "domyslna";
     }
 
     static String description(AccountStatus status) {

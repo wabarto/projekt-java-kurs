@@ -2,6 +2,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 sealed abstract class BankAccount implements Comparable<BankAccount> permits SavingsAccount, CheckingAccount, BusinessAccount {
     private AccountStatus status = AccountStatus.ACTIVE;
@@ -16,6 +17,8 @@ sealed abstract class BankAccount implements Comparable<BankAccount> permits Sav
     protected BigDecimal balance;
 
     private int transactionCount;
+
+    private Customer customer;
 
     public BankAccount(String accountNumber, BigDecimal balance) {
         if (accountNumber == null || accountNumber.isBlank()) {
@@ -53,6 +56,14 @@ sealed abstract class BankAccount implements Comparable<BankAccount> permits Sav
 
     public String getDescription() {
         return String.format("%s: %.2f zł", accountNumber, balance);
+    }
+
+    public Optional<String> getOptionalDescription() {
+        return Optional.of(String.format("%s: %.2f zł", accountNumber, balance));
+    }
+
+    public Optional<Customer> getCustomer() {
+        return Optional.ofNullable(customer);
     }
 
 
