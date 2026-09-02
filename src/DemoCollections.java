@@ -1,4 +1,6 @@
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class DemoCollections {
     public static void main(String[] args) {
@@ -137,7 +139,29 @@ public class DemoCollections {
 //            System.out.println(stock.get(key));
 //        }
 
+        TreeMap<String, Integer> treeStock = new TreeMap<>();
+        treeStock.put("001", 5);
+        treeStock.put("005", 3);
+        treeStock.put("003", 4);
+        treeStock.put("007", 2);
 
+        treeStock.firstKey(); // "001" najmniejszy klucz
+        treeStock.lastKey(); // "007"
+        treeStock.firstEntry(); // 001-5
+        treeStock.lastEntry(); // 007-2
+        System.out.println(treeStock.floorKey("005")); // 005 najwiekszy klucz z <= podanego
+        System.out.println(treeStock.ceilingKey("004")); // 005 najmniejszy klucz >= podanego
+        System.out.println(treeStock.lowerKey("003")); // 001 ściśle mniejszy
+        System.out.println(treeStock.higherKey("001")); // 003 ściśle większy
+        System.out.println(treeStock.headMap("005")); // {001=5, 003=4} klucze mniejsze od zadanego
+        System.out.println(treeStock.tailMap("006")); // {007=2} od podanego w gore
+        System.out.println(treeStock.subMap("001", "007")); // {001=5, 003=4, 005=3} od wlacznie do wylacznie
+        System.out.println(treeStock.descendingMap()); // {007=2, 005=3, 003=4, 001=5} ta sama mapa z odwrotna kolejnoscia
+        System.out.println(treeStock.pollFirstEntry()); // 001=5 zwraca i usuwa pierwszy wpis
+
+
+
+        // queue
         Queue<String> elements = new ArrayDeque<>();
         elements.offer("1");
         elements.offer("2");
@@ -175,6 +199,54 @@ public class DemoCollections {
         history.push("3");
         System.out.println(history.pop());
         System.out.println(history.peek());
+
+        PriorityQueue<Integer> pq = new PriorityQueue<>(Comparator.reverseOrder());
+        pq.addAll(List.of(10, 20, 5, 30));
+
+        while(!pq.isEmpty()) {
+            System.out.println(pq.poll() + " ");
+        }
+
+
+        // Collections
+
+        List<Integer> nums = new ArrayList<>(List.of(3, 5, 20, 31, 14));
+        Collections.sort(nums);
+        System.out.println(nums);
+        Collections.reverse(nums);
+        System.out.println(nums);
+        Collections.shuffle(nums);
+        System.out.println(nums);
+        System.out.println(Collections.min(nums));
+        Collections.max(nums);
+        Collections.frequency(nums, 5); // zliczanie wystapien
+        Collections.swap(nums, 0, 1); // zamiana dwoch elementow
+        Collections.emptyList();
+        Collections.singleton(1);
+        List<String> copies = Collections.nCopies(5, "x");
+        List<String> newList = new ArrayList<>();
+        newList.add("X1");
+        Collections.disjoint(Set.of("A", "B"), Set.of("C", "D")); // true czy zbiory sa rozlaczne
+        List<String> view = Collections.unmodifiableList(newList);
+        List<String> copy = List.copyOf(newList);
+        newList.add("X2");
+        System.out.println(view);
+        System.out.println(copy);
+
+
+        Map<String, Integer> concurrentMap = new ConcurrentHashMap<>();
+        concurrentMap.putIfAbsent("001", 0);
+        concurrentMap.merge("001", 1, Integer::sum);
+
+        List<String> stringList = new CopyOnWriteArrayList<>();
+
+
+
+
+
+
+
+
 
 
 
