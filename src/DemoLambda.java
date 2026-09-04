@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.*;
 
-public class DemoLambda implements InterestPolicy {
+public class DemoLambda {
     public static void main(String[] args) {
         List<Product> products = new ArrayList<>(List.of(
                 new Product("001", "laptop", new BigDecimal("3999.00"), 5),
@@ -114,6 +114,11 @@ public class DemoLambda implements InterestPolicy {
 
         Consumer<Product> onChange = logger.andThen(print);
         onChange.accept(laptop);
+
+        Function<Product, Product> asIs = Function.identity();
+        System.out.println(asIs.apply(laptop) == laptop);
+
+        Function<BigDecimal, BigDecimal> discount = 1 > 0 ? p -> p.multiply(new BigDecimal("0.1")) : Function.identity();
 
     }
 

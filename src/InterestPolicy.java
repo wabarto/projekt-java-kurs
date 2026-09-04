@@ -4,10 +4,10 @@ public interface InterestPolicy {
 
 
     default double caulcatePrice() {
-
+        return 0;
     }
 
     static double staticPrice() {
-
+        return 0;
     }
 }
