@@ -4,14 +4,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.function.*;
 
-public class DemoLambda {
+public class DemoLambda implements InterestPolicy {
     public static void main(String[] args) {
         List<Product> products = new ArrayList<>(List.of(
                 new Product("001", "laptop", new BigDecimal("3999.00"), 5),
                 new Product("002", "mysz", new BigDecimal("49.00"), 5),
                 new Product("003", "kawa", new BigDecimal("32.00"), 5)
         ));
-
 
         // lambda
         Comparator<Product> b = (x, y) -> x.price().compareTo(y.price());
@@ -97,22 +96,24 @@ public class DemoLambda {
         Function<String, BigDecimal> toMoney = BigDecimal::new;
 
 
+        Function<BigDecimal, BigDecimal> withVat = p -> p.multiply(new BigDecimal("1.23"));
+        Function<BigDecimal, BigDecimal> minusThen = p -> p.subtract(new BigDecimal("10"));
+
+        withVat.andThen(minusThen).apply(new BigDecimal("100")); /// 123 - 10 = 113
+
+        withVat.compose(minusThen).apply(new BigDecimal("100")); // (100-10) * 1.23 = 110.7
 
 
+        Predicate<Product> cheap = p -> p.price().compareTo(new BigDecimal("100")) < 0;
+        Predicate<Product> hasName = p -> p.name() != null && !p.name().isBlank();
 
+        Predicate<Product> available = inStock.and(hasName); // inStock.or(hasName)
+        Predicate<Product> outOfStock = inStock.negate();
 
+        Predicate<String> notEmpty = Predicate.not(String::isEmpty);
 
-
-
-
-
-
-
-
-
-
-
-
+        Consumer<Product> onChange = logger.andThen(print);
+        onChange.accept(laptop);
 
     }
 
