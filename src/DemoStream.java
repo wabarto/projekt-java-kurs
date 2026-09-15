@@ -1,8 +1,5 @@
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -18,9 +15,6 @@ public class DemoStream {
                 new StreamProduct("ACCE-001", "Klawiatura MX", "AKCESORIA", new BigDecimal("499.00"), 40, 4.7),
                 new StreamProduct("ACCE-002", "Mysz Logitech", "AKCESORIA", new BigDecimal("199.00"), 60, 4.4),
                 new StreamProduct("ACCE-003", "Podkładka4", "AKCESORIA", new BigDecimal("49.00"), 3, 3.9),
-                new StreamProduct("ACCE-003", "Podkładka1", "AKCESORIA", new BigDecimal("49.00"), 3, 3.9),
-                new StreamProduct("ACCE-003", "Podkładka2", "AKCESORIA", new BigDecimal("49.00"), 3, 3.9),
-                new StreamProduct("ACCE-003", "Podkładka3", "AKCESORIA", new BigDecimal("49.00"), 3, 3.9),
                 new StreamProduct("AUDI-001", "Sluchawki sony", "AUDIO", new BigDecimal("899.00"), 24, 4.9),
                 new StreamProduct("AUDI-002", "JBL", "AUDIO", new BigDecimal("349.00"), 18, 4.2)
         );
@@ -190,7 +184,146 @@ public class DemoStream {
 
         // anyMatch, allMatch, noneMatch
 
+        boolean isOutOfStock = products.stream()
+                .anyMatch(p -> p.stock() == 0);
+
+        boolean allRated = products.stream()
+                .allMatch(p -> p.rating() > 0);
+
+        boolean isFree = products.stream()
+                .noneMatch(p -> p.price().signum() == 0);
+
+
         // reduce
+
+        BigDecimal stockValue = products.stream()
+                .map(p -> p.price().multiply(BigDecimal.valueOf(p.stock())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        Optional<BigDecimal> highestPrice = products.stream()
+                .map(StreamProduct::price)
+                .reduce(BigDecimal::max);
+
+
+        // tak nie robimy bo tworzy nam nowy obiekt String przy kazdym kroku
+        String reduceCodes = products.stream()
+                .map(StreamProduct::sku)
+                .reduce("", (a, b) -> a.isEmpty() ? b : a + ", " + b);
+
+
+        List<String> mutable = products.stream()
+                .map(StreamProduct::name)
+                .collect(Collectors.toList());
+
+        List<String> immutable = products.stream()
+                .map(StreamProduct::name)
+                .collect(Collectors.toUnmodifiableList());
+
+        Set<String> categories = products.stream()
+                .map(StreamProduct::category)
+                .collect(Collectors.toSet());
+
+        TreeSet<String> sortedCategory = products.stream()
+                .map(StreamProduct::category)
+                .collect(Collectors.toCollection(TreeSet::new));
+
+        String joined = products.stream()
+                .map(StreamProduct::name)
+                .collect(Collectors.joining(", "));
+
+        String bracketed = products.stream()
+                .map(StreamProduct::sku)
+                .collect(Collectors.joining(", ", "[", "]"));
+
+        Map<String, String> bySku = products.stream()
+                .collect(Collectors.toMap(StreamProduct::sku, StreamProduct::name));
+
+
+        Map<String, String> duplicated = products.stream()
+                .collect(Collectors.toMap(StreamProduct::category, StreamProduct::name, (a, b) -> a + "," + b));
+
+
+        long count = products.stream()
+                .collect(Collectors.counting());
+
+
+        double priceSum = products.stream()
+                .collect(Collectors.summingDouble(p -> p.price().doubleValue()));
+
+        double avgRating = products.stream()
+                .collect(Collectors.averagingDouble(StreamProduct::rating));
+
+        DoubleSummaryStatistics stats = products.stream()
+                .collect(Collectors.summarizingDouble(StreamProduct::rating));
+
+        stats.getCount();
+        stats.getMin();
+        stats.getMax();
+        stats.getSum();
+        stats.getAverage();
+
+
+
+        Map<String, List<StreamProduct>> groupedByCategory = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category));
+
+
+        groupedByCategory.forEach((cat, join) -> System.out.println(cat + " " + join.size()));
+
+
+
+        Map<String, Long> countElements = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.counting()));
+        // {ELEKTRONIKA=3, TELEFONY=2}
+
+        Map<String, Double> averageRating = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.averagingDouble(StreamProduct::rating)));
+
+
+        Map<String, List<String>> productNames = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.mapping(StreamProduct::name, Collectors.toList())));
+
+
+        Map<String, Optional<StreamProduct>> mostExpensiveCat = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.maxBy(Comparator.comparing(StreamProduct::price))));
+
+        Map<String, Optional<StreamProduct>> mostCheapestCat = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.minBy(Comparator.comparing(StreamProduct::price))));
+
+        Map<String, String> descriptions = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.mapping(StreamProduct::name, Collectors.joining(", "))));
+
+
+        Map<String, BigDecimal> valuePerCategory = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, Collectors.reducing(
+                        BigDecimal.ZERO,
+                        p -> p.price().multiply(BigDecimal.valueOf(p.stock())),
+                        BigDecimal::add)));
+
+
+        TreeMap<String, Long> groupedSorted = products.stream()
+                .collect(Collectors.groupingBy(StreamProduct::category, TreeMap::new, Collectors.counting()));
+
+        Map<String, Map<Boolean, List<String>>> nested = products.stream()
+                .collect(Collectors.groupingBy(
+                        StreamProduct::category,
+                        Collectors.groupingBy(
+                                p -> p.stock() > 0,
+                                Collectors.mapping(StreamProduct::name, Collectors.toList())
+                        )
+                ));
+
+        System.out.println(nested.get("ELEKTRONIKA"));
+
+
+
+
+
+
+
+
+
+
 
 
 
