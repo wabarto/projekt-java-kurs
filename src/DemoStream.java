@@ -316,25 +316,64 @@ public class DemoStream {
         System.out.println(nested.get("ELEKTRONIKA"));
 
 
+        Map<Boolean, List<StreamProduct>> partition = products.stream()
+                .collect(Collectors.partitioningBy(p -> p.price().compareTo(new BigDecimal("1000")) > 0));
+
+
+        Map<Boolean, Long> partitionCount = products.stream()
+                .collect(Collectors.partitioningBy(p -> p.stock() > 0, Collectors.counting()));
+
+
+        // IntStream, LongStream, DoubleStream
 
 
 
+        int totalStock = products.stream()
+                .mapToInt(StreamProduct::stock)
+                .sum();
+
+        System.out.println(totalStock);
+
+        products.stream()
+                .mapToInt(StreamProduct::stock)
+                .average();
+
+        products.stream()
+                .mapToInt(StreamProduct::stock)
+                .max();
 
 
+        IntSummaryStatistics statsInt = products.stream()
+                .mapToInt(StreamProduct::stock)
+                .summaryStatistics();
+
+        statsInt.getMin();
+        statsInt.getAverage();
+
+        List<Integer> stockList = products.stream()
+                .mapToInt(StreamProduct::stock)
+                .boxed()
+                .toList();
+
+        IntStream.rangeClosed(1, 3)
+                .mapToObj(i -> "page " + i)
+                .forEach(System.out::println);
 
 
+        List<Integer> bigList = IntStream.rangeClosed(1, 10).boxed().toList();
 
+        long start = System.nanoTime();
+        long sum1 = bigList.stream()
+                .mapToLong(Integer::longValue)
+                .sum();
+        System.out.printf("stream: %d ms%n", (System.nanoTime() - start) / 1_000_000);
 
+        start = System.nanoTime();
 
+        long sum2 = bigList.parallelStream()
+                .mapToLong(Integer::longValue)
+                .sum();
 
-
-
-
-
-
-
-
-
-
+        System.out.printf("parallelStream: %d ms%n", (System.nanoTime() - start) / 1_000_000);
     }
 }
