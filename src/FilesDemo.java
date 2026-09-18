@@ -1,3 +1,8 @@
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.*;
+import com.opencsv.exceptions.CsvValidationException;
+
 import java.io.*;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -5,11 +10,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class FilesDemo {
+
+    static ObjectMapper objectMapper = new ObjectMapper();
     public static void main(String[] args) throws IOException {
         List<StreamProduct> products = List.of(
                 new StreamProduct("ELEC-001", "Laptop Dell", "ELEKTRONIKA", new BigDecimal("3499.00"), 5, 4.6),
@@ -141,8 +150,114 @@ public class FilesDemo {
         }
 
 
+        Files.writeString(Path.of("date/produkty.csv"), """
+                sku,name,category,price,stock,rating
+                ELEC-001,"Laptop, Dell",ELEKTRONIKA,3499.00,5,4.6
+                ELEC-002,Mysz Logitech,ELEKTRONIKA,150.00,3,4.6
+                ELEC-003,Popsuty,ELEKTRONIKA,150.00
+                """);
+
+
+        List<StreamProduct> loaded = loadProducts(Path.of("date/produkty.csv"));
+        System.out.println(loaded);
+
+        exportProducts(loaded, Path.of("date/eksport.csv"));
+
+        try (CSVReader reader = new CSVReaderBuilder(new FileReader("date/produkty.csv"))
+                .withCSVParser(new CSVParserBuilder()
+                        .withSeparator(',')
+                        .build())
+                .build();
+             CSVWriter writer = new CSVWriter(new FileWriter("date/output.csv"))) {
+            String[] row;
+
+            while ((row = reader.readNext()) != null) {
+                writer.writeNext(row);
+            }
+
+        } catch (CsvValidationException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        StreamProduct laptop = products.get(0);
+        String json = objectMapper.writeValueAsString(laptop);
+        System.out.println(json);
+
+
+        String pretty = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(laptop);
+        System.out.println(pretty);
+
+
+
+        String list = objectMapper.writeValueAsString(products);
+        System.out.println(list);
+
+        objectMapper.writerWithDefaultPrettyPrinter()
+                .writeValue(Path.of("date/produkty.json").toFile(), products);
+
+
+        String input = """
+                {"sku":"ELEC-001","name":"Laptop Dell","category":"ELEKTRONIKA","price":3499.00,"stock":5,"rating":4.6}
+                """;
+        StreamProduct parsed = objectMapper.readValue(input, StreamProduct.class);
+
+        System.out.println(parsed);
+
+        List<StreamProduct> fromFile = objectMapper.readValue(Path.of("date/produkty.json").toFile(), new TypeReference<>() {
+        });
+
+
+
+        System.out.println(fromFile);
+
+
 
 
 
     }
+
+
+    static Optional<StreamProduct> parseLine(String line) {
+        String[] fields = line.split(",", -1);
+
+        if (fields.length != 6) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new StreamProduct(
+                    fields[0].trim(),
+                    fields[1].trim(),
+                    fields[2].trim(),
+                    new BigDecimal(fields[3].trim()),
+                    Integer.parseInt(fields[4].trim()),
+                    Double.parseDouble(fields[5].trim())
+            ));
+        } catch (NumberFormatException e) {
+            return Optional.empty();
+        }
+    }
+
+
+    static List<StreamProduct> loadProducts(Path file) throws IOException {
+        try (Stream<String> lines = Files.lines(file)) {
+            return lines.skip(1)
+                    .filter(l -> !l.isBlank())
+                    .map(FilesDemo::parseLine)
+                    .flatMap(Optional::stream)
+                    .toList();
+        }
+    }
+
+    static void exportProducts(List<StreamProduct> list, Path file) throws IOException {
+        String csv = Stream.concat(
+                Stream.of("sku,name,category,price,stock,rating"),
+                list.stream()
+                        .map(p -> String.join(",", p.sku(), p.name(), p.category(), p.price().toString(), String.valueOf(p.stock()), String.valueOf(p.rating())))
+        ).collect(Collectors.joining("\n"));
+
+        Files.writeString(file, csv);
+    }
+
 }
