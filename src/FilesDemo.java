@@ -1,5 +1,12 @@
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.opencsv.*;
 import com.opencsv.exceptions.CsvValidationException;
 
@@ -8,9 +15,8 @@ import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.util.ArrayList;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -211,7 +217,87 @@ public class FilesDemo {
 
         System.out.println(fromFile);
 
+        String spcInput = """
+                {"sku":"ELEC-001","name":"Laptop Dell"}
+                """;
 
+        StreamProductClass spc = objectMapper.readValue(spcInput, StreamProductClass.class);
+
+        System.out.println(spc);
+
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
+        objectMapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        // "2026-09-21", nie 18735782
+
+        StreamProductClass spc1 = new StreamProductClass("1", "name", LocalDate.of(2026, 11, 21));
+
+        System.out.println(objectMapper.writeValueAsString(spc1));
+
+
+        String response = """
+                {
+                    "status": "ok",
+                    "date": {
+                        "product": { "id": 1, "name": "Laptop", "price": 3499.00 },
+                        "tags": ["nowosc", "promocja", "polecane"]
+                        },
+                    "meta": { "total": 1, "page": 1 }
+                    }
+                """;
+
+        JsonNode root = objectMapper.readTree(response);
+
+        System.out.println(root.get("status").asText());
+        System.out.println(root.get("meta").get("total").asInt());
+
+        System.out.println(root.path("date").path("product").path("name").asText());
+
+        String missing = root.path("date").path("notexists").path("name").asText();
+        System.out.println(missing);
+
+        JsonNode tags = root.path("date").path("tags");
+
+        if (tags.isArray()) {
+            tags.forEach(t -> System.out.println(t.asText()));
+        }
+
+        System.out.println(root.has("status"));
+        System.out.println(root.path("date").path("product").isObject());
+
+
+        StreamProduct jsonProduct = objectMapper.treeToValue(root.path("date").path("product"), StreamProduct.class);
+
+        System.out.println(jsonProduct);
+
+
+        ObjectNode node = objectMapper.createObjectNode();
+        node.put("status", "ok");
+        node.put("count", products.size());
+
+        ArrayNode names = objectMapper.createArrayNode();
+        products.forEach(p -> names.add(p.name()));
+        node.set("products", names);
+
+
+        System.out.println(objectMapper.writeValueAsString(node));
+
+        Payment payment = new CardPayment(new BigDecimal("199.00"), "31223232");
+        System.out.println(objectMapper.writeValueAsString(payment));
+
+        String cardInput = """
+                {
+                  "type" : "card",
+                  "amount" : 199.00,
+                  "cardNumber" : "31223232"
+                }
+                """;
+
+        Payment parsedPayment = objectMapper.readValue(cardInput, Payment.class);
+        System.out.println(parsedPayment.getClass().getSimpleName());
 
 
 
