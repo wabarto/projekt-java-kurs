@@ -1,3 +1,5 @@
+import java.util.concurrent.atomic.LongAdder;
+
 public class ThreadsDemo {
 
     // 3
@@ -60,6 +62,29 @@ public class ThreadsDemo {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+
+        Thread monitorThread = new Thread(() -> {
+            while (true) {
+                System.out.println("monitoring...");
+                try {
+                    Thread.sleep(300);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+
+        monitorThread.setDaemon(true);
+        monitorThread.start();
+
+
+        LongAdder adder = new LongAdder();
+        adder.increment();
+        adder.add(5);
+        System.out.println(adder.sum());
+
+
+
 
 
     }
