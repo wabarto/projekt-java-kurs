@@ -171,8 +171,6 @@ public class ThreadsDemo {
 
         scheduled.schedule(() -> System.out.println("reminder"), 2, TimeUnit.SECONDS);
 
-
-
         ScheduledFuture<?> heartbeat = scheduled.scheduleAtFixedRate(
                 () -> System.out.println("heartbeat"),
                 0, 1, TimeUnit.SECONDS
@@ -189,7 +187,146 @@ public class ThreadsDemo {
         scheduled.shutdown();
 
 
+        CompletableFuture<String> task3 = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "test";
+                });
+
+        System.out.println("do something");
+        System.out.println(task3.join());
+
+        CompletableFuture<Void> notification = CompletableFuture.runAsync(() -> System.out.println("notification"));
+
+
+        ExecutorService pool = Executors.newFixedThreadPool(20);
+
+        CompletableFuture<String> request = CompletableFuture.supplyAsync(() -> "get something from api", pool);
+
+        CompletableFuture<Integer> length = CompletableFuture
+                .supplyAsync(() -> "name")
+                .thenApply(String::trim)
+                .thenApply(String::toUpperCase)
+                .thenApply(String::length);
+
+        System.out.println(length.join());
+
+        CompletableFuture<CompletableFuture<String>> wrong = findId("123").thenApply(id -> fetchData(id));
+
+        CompletableFuture<String> good = findId("123").thenCompose(id -> fetchData(id));
+
+
+
+        CompletableFuture<String> user = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "anna";
+        });
+        CompletableFuture<String> orders = CompletableFuture.supplyAsync(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            return "orders";
+        });
+        CompletableFuture<String> weather = CompletableFuture.supplyAsync(() -> "18c");
+
+
+        String profiles = user
+                .thenCombine(orders, (u, z) -> u + "-" + z)
+                .thenCombine(weather, (uz, p) -> uz + ", " + p)
+                .join();
+
+        System.out.println(profiles);
+
+
+        List<String> logins = List.of("anna", "bartek", "piotrek");
+
+        List<CompletableFuture<String>> tasks2 = logins.stream()
+                .map(login -> CompletableFuture.supplyAsync(() -> "profiles " + login))
+                .toList();
+
+
+
+        CompletableFuture.allOf(tasks2.toArray(new CompletableFuture[0])).join();
+
+        List<String> profiles2 = tasks2.stream()
+                .map(CompletableFuture::join)
+                .toList();
+
+        System.out.println(profiles2);
+
+
+
+        CompletableFuture.supplyAsync(() -> "done")
+                .thenAccept(System.out::println);
+
+        CompletableFuture.supplyAsync(() -> "zapis do bazy")
+                .thenRun(() -> System.out.println("done"));
+
+
+        CompletableFuture<Object> fastest1 = CompletableFuture.anyOf(
+                CompletableFuture.supplyAsync(() -> "1"),
+                CompletableFuture.supplyAsync(() -> "2"),
+                CompletableFuture.supplyAsync(() -> "3")
+        );
+
+        System.out.println(fastest1.join());
+
+
+        String result3 = CompletableFuture.supplyAsync(() -> {
+            if (Math.random() > 0.5) {
+                throw new RuntimeException("123");
+            }
+            return "dane";
+
+        }).exceptionally(ex -> {
+            System.out.println(ex.getMessage());
+            return "dane z cache";
+        }).join();
+
+        System.out.println(result3);
+
+
+       String handled = CompletableFuture.supplyAsync(() -> "doSomething")
+                .handle((data, ex) -> {
+                    if (ex != null) {
+                        System.out.println(ex.getMessage());
+                        return "value";
+                    }
+
+                    return data;
+                }).join();
+
+        System.out.println(handled);
+
+        CompletableFuture.supplyAsync(() -> "doSomething")
+                .whenComplete((data, ex) -> {
+                    if (ex != null) {
+                        System.out.println(ex.getMessage());
+                    }
+
+                    System.out.println("ready" + data);
+                }).join();
+
+
     }
+
+    static CompletableFuture<Long> findId (String login) {
+        return CompletableFuture.supplyAsync(() -> 42L);
+    }
+
+    static CompletableFuture<String> fetchData (Long id) {
+        return CompletableFuture.supplyAsync(() -> "dane" + id);
+    }
+
 
 //    static void transferAccount(Account from, Account to, double amount) {
 //        synchronized (from) {
