@@ -1,5 +1,4 @@
-import java.util.List;
-import java.util.Timer;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.LongAdder;
 
@@ -316,6 +315,144 @@ public class ThreadsDemo {
                     System.out.println("ready" + data);
                 }).join();
 
+
+
+        // collections
+
+        Map<String, Integer> plain = new HashMap<>();
+        Map<String, Integer> safe = new ConcurrentHashMap<>();
+
+        Runnable task4 = () -> {
+            for (int i = 0; i < 10_000; i++) {
+                plain.merge("key", 1, Integer::sum);
+                safe.merge("key", 1, Integer::sum);
+            }
+        };
+
+        Thread a1 = new Thread(task4);
+        Thread a2 = new Thread(task4);
+        a1.start();
+        a2.start();
+        a1.join();
+        a2.join();
+
+        System.out.println("HashMap: " + plain.get("key"));
+        System.out.println("ConcurrentHashMap: " + safe.get("key"));
+
+
+        List<String> plainList = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < 10_000; i++) {
+            plainList.add("test-" + i);
+        }
+
+
+        Runnable reading = () -> {
+            for (int i = 0; i < 1_000; i++) {
+                int total = 0;
+                for (String test : plainList) {
+                    total += test.length();
+                }
+            }
+            System.out.println("reader finished");
+        };
+
+        Runnable writing = () -> {
+            for (int i = 0; i < 10_000; i++) {
+                plainList.add("extra-" + i);
+            }
+            System.out.println("writer finished");
+        };
+
+        Thread reader = new Thread(reading);
+        Thread writer = new Thread(writing);
+
+        reader.start();
+        writer.start();
+        reader.join();
+        writer.join();
+
+
+        List<String> syncList = Collections.synchronizedList(new ArrayList<>());
+
+        Runnable adding = () -> {
+            for (int i = 0; i < 10_000; i++) {
+                syncList.add("test-" + i);
+            }
+        };
+
+        Thread a5 = new Thread(adding);
+        Thread a6 = new Thread(adding);
+        a5.start();
+        a6.start();
+        a5.join();
+        a6.join();
+
+        System.out.println("size: " + syncList.size());
+
+
+        new Thread(() -> {
+            for (int i = 0; i < 10_000; i++) {
+                syncList.add("test-" + i);
+            }
+        }).start();
+
+
+
+
+        synchronized(syncList) {
+            int total = 0;
+
+            for (String value1 : syncList) {
+                total += value1.length();
+            }
+
+            System.out.println("sum size: " + total);
+        }
+
+
+        BlockingQueue<String> queue = new LinkedBlockingQueue<>(5); // opcjonalny limit
+        final String END = "_END_";
+
+        Thread producer = new Thread(() -> {
+            try {
+                for (int i = 0; i <= 10; i++) {
+                    queue.put("task-" + i);
+                    System.out.println("produced task: " + i);
+                }
+                queue.put(END);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }, "producer");
+
+        Thread consumer = new Thread(() -> {
+            try {
+                while (true) {
+                    String element = queue.take();
+                    if (END.equals(element)) {
+                        break;
+                    }
+                    System.out.println("consumed " + element);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }, "consumer");
+
+
+        producer.start();
+        consumer.start();
+        producer.join();
+        consumer.join();
+
+
+
+
+        BlockingQueue<Integer> fixedSize = new ArrayBlockingQueue<>(5); // staly rozmiar
+
+        BlockingQueue<Integer> byPriority = new PriorityBlockingQueue<>(); // porzadek naturalny albo komparator
+
+        BlockingQueue<String> synchronous = new SynchronousQueue<>(); // pojemnosc ZERO, czeka na konsumenta
 
     }
 
