@@ -1,5 +1,7 @@
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAdjusters;
 import java.util.*;
@@ -144,6 +146,149 @@ public class DateDemo {
 
 
 
+        ZoneId.getAvailableZoneIds().stream()
+                .filter(z -> z.startsWith("Europe"))
+                .sorted()
+                .limit(10)
+                .forEach(System.out::println);
+
+
+
+
+        ZonedDateTime inWarsaw = ZonedDateTime.of(2024, 6, 15, 14, 30, 0, 0, ZoneId.of("Europe/Warsaw"));
+
+
+        System.out.println(inWarsaw);
+
+        ZonedDateTime inTokyo = inWarsaw.withZoneSameInstant(ZoneId.of("Asia/Tokyo"));
+
+        System.out.println(inTokyo);
+
+
+        ZonedDateTime sameLocalTime = inWarsaw.withZoneSameLocal(ZoneId.of("Asia/Tokyo"));
+
+        System.out.println(sameLocalTime);
+
+
+        Instant nowInstant = Instant.now();
+
+        System.out.println(nowInstant);
+
+
+        System.out.println(nowInstant.toEpochMilli());
+        Instant fromMilis = Instant.ofEpochMilli(System.currentTimeMillis());
+        System.out.println(fromMilis);
+
+        System.out.println(inWarsaw.toInstant());
+
+        System.out.println(nowInstant.atZone(ZoneId.of("Europe/Warsaw")));
+
+
+
+        // przeplyw
+
+        LocalDateTime userInput = LocalDateTime.of(2024, 6, 15, 14, 30);
+        ZoneId userZone = ZoneId.of("Europe/Warsaw");
+
+
+        Instant forDatabase = userInput.atZone(userZone).toInstant();
+        System.out.println(forDatabase);
+
+        ZonedDateTime localView = forDatabase.atZone(ZoneId.of("America/New_York"));
+        ZonedDateTime asiaView = forDatabase.atZone(ZoneId.of("Asia/Tokyo"));
+        System.out.println(localView);
+
+
+        ZonedDateTime before = ZonedDateTime.of(2026, 3, 29, 1, 30, 0, 0, ZoneId.of("Europe/Warsaw"));
+        ZonedDateTime after = before.plusHours(2);
+        System.out.println(before);
+        System.out.println(after);
+
+
+        ZonedDateTime missingHour = ZonedDateTime.of(2026, 3, 29, 2, 30, 0, 0, ZoneId.of("Europe/Warsaw"));
+        System.out.println(missingHour);
+
+
+        // 2026-06-15
+
+        // 05.06.2026
+        // 06/15/2026
+
+
+        LocalDate date5 = LocalDate.of(2024, 6, 15);
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 6, 15, 14, 30, 45);
+
+        date5.format(DateTimeFormatter.ISO_LOCAL_DATE); // 2024-06-15
+        localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME); // 2024-06-15T14:30:45
+
+
+        // d / dd - dzien miesiaca - 5 / 05
+        // M / MM - miesiac - 5 / 05
+        // MMM / MMMM - miesiac slownie - cze / czerwiec
+        // yy / yyyy - rok - 24 / 2024
+        // E / EEE - dzien tygodnia - sob / sobota
+        // H / HH - godzina 0 - 23 / 9 / 09
+        // h / hh - godzina 1 - 12 2 / 02
+        // mm - minuty
+        // ss - sekundy
+        // a - przed albo po poludniu - AM / PM
+        // z / Z - strefa/offset CEST / +0200
+
+
+        DateTimeFormatter polish = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        System.out.println(date5.format(polish));
+
+
+        DateTimeFormatter polishWithTime = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        System.out.println(dateTime1.format(polishWithTime));
+
+
+        DateTimeFormatter full = DateTimeFormatter.ofPattern("EEEE, d MMMM yyyy, HH:mm", Locale.forLanguageTag("pl"));
+        System.out.println(dateTime1.format(full));
+
+        ZonedDateTime zdt = ZonedDateTime.of(dateTime, ZoneId.of("Europe/Warsaw"));
+        DateTimeFormatter zonedFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm z", Locale.US);
+        System.out.println(zdt.format(zonedFormat));
+
+
+        LocalDate d2 = LocalDate.parse("2024-06-15");
+
+        System.out.println(d2);
+
+        LocalDate d3 = LocalDate.parse("15.06.2026", polish);
+        System.out.println(d3);
+
+        parseDate("15.06.2024", polish).ifPresent(System.out::println);
+        // 5.6.2024
+
+        DateTimeFormatter flexible = new DateTimeFormatterBuilder()
+                .appendOptional(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                .appendOptional(DateTimeFormatter.ofPattern("d.M.yyyy"))
+                .appendOptional(DateTimeFormatter.ISO_LOCAL_DATE)
+                .toFormatter();
+
+
+        System.out.println(LocalDate.parse("15.06.2024", flexible));
+        System.out.println(LocalDate.parse("5.6.2024", flexible));
+
+
+        LocalDate birthDate1 = LocalDate.of(1950, 6, 15);
+        LocalDate today3 = LocalDate.now();
+
+
+        int age3 = Period.between(birthDate1, today3).getYears();
+
+        boolean isBirthdayToday = birthDate1.getMonth() == today.getMonth() && birthDate1.getDayOfMonth() == today.getDayOfMonth();
+
+
+        LocalDate from3 = LocalDate.of(2024, 6, 10);
+        LocalDate to3 = LocalDate.of(2024, 6, 16);
+
+        long businessDays  = from3.datesUntil(to3.plusDays(1))
+                .filter(day -> day.getDayOfWeek().getValue() <= 5)
+                .count();
+
+        System.out.println(businessDays);
 
 
 
@@ -168,5 +313,30 @@ public class DateDemo {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    }
+
+
+    static Optional<LocalDate> parseDate(String text, DateTimeFormatter fmt) {
+        try {
+            return Optional.of(LocalDate.parse(text, fmt));
+        } catch (DateTimeParseException e) {
+            // zalogowac blad
+            return Optional.empty();
+        }
     }
 }
