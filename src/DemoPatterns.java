@@ -72,5 +72,28 @@ public class DemoPatterns {
         dynamic.findAll();
 
 
+        DiscountStrategy noDiscount = (price, quantity) -> price * quantity;
+        DiscountStrategy summerSale = (price, quantity) -> Math.max(price * quantity - 50, 0);
+        DiscountStrategy loyalty = (price, quantity) -> price * quantity * 0.9;
+
+
+        Map<String, DiscountStrategy> strategies = new LinkedHashMap<>();
+        strategies.put("STANDARD", noDiscount);
+        strategies.put("SALE", summerSale);
+        strategies.put("LOYALTY", loyalty);
+
+
+        double price = 49.99;
+        int quantity = 12;
+
+        for (Map.Entry<String, DiscountStrategy> entry : strategies.entrySet()) {
+            PriceCalculator calculator = new PriceCalculator(entry.getValue());
+            System.out.println(calculator.calculate(price, quantity));
+        }
+
+
+
+
+
     }
 }
