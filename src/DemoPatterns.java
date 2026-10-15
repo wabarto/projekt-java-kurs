@@ -1,10 +1,8 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.lang.reflect.Proxy;
+import java.util.*;
 
 public class DemoPatterns {
     public static void main(String[] args) throws IOException {
@@ -57,6 +55,22 @@ public class DemoPatterns {
 
 
         System.out.println(email);
+
+        UserRepository real = new DatabaseUserRepository();
+        UserRepository cached = new CachingUserRepositoryProxy(real);
+        UserRepository logged = new LoggingUserRepositoryProxy(cached);
+
+        Optional<User> user = logged.findById(5L);
+
+        UserRepository dynamic = (UserRepository) Proxy.newProxyInstance(
+                UserRepository.class.getClassLoader(),
+                new Class<?>[] { UserRepository.class },
+                new TimingInvocationHandler(new DatabaseUserRepository())
+        );
+
+        dynamic.findById(5L);
+        dynamic.findAll();
+
 
     }
 }
