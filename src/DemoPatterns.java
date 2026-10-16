@@ -93,7 +93,22 @@ public class DemoPatterns {
 
 
 
+        // placeOrder: zapisywac zamowienie, wysylac potwierdzenie zamowienia, zarezerwowac towar na magazynie, trackowac
 
 
+
+        OrderEventBus orderEventBus = new OrderEventBus();
+        WarehouseListener warehouseListener = new WarehouseListener();
+
+        orderEventBus.subscribe("ORDER_PLACED", warehouseListener);
+        orderEventBus.subscribe("ORDER_CANCELLED", new EmailNotificationListener());
+        orderEventBus.subscribe("ORDER_PLACED", new EmailNotificationListener());
+
+
+        OrderService orderService = new OrderService(orderEventBus);
+
+        orderService.placeOrder("001", "32", 200);
+
+        orderService.cancelOrder("001", "123");
     }
 }
