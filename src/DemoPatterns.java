@@ -5,6 +5,18 @@ import java.lang.reflect.Proxy;
 import java.util.*;
 
 public class DemoPatterns {
+
+    private static final Map<String, String> JSON = Map.of("Content-Type", "application/json");
+
+    private static final String TOKEN = "Bearer valid-token-123";
+
+    static RequestHandler buildChain () {
+        RequestHandler auth = new AuthHandler();
+        auth.setNext(new ContentTypeHandler())
+                .setNext(new BusinessHandler());
+        return auth;
+    }
+
     public static void main(String[] args) throws IOException {
         // builder
 
@@ -110,5 +122,11 @@ public class DemoPatterns {
         orderService.placeOrder("001", "32", 200);
 
         orderService.cancelOrder("001", "123");
+
+
+        buildChain().handle(new ApiRequest("/api/todos", TOKEN, "{\"title\":\"test\"}", JSON));
+        buildChain().handle(new ApiRequest("/api/todos", null, "{\"title\":\"test\"}", JSON));
+
+
     }
 }
